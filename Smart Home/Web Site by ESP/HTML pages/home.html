@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv = "content-type" content = "text/html; charset = UTF-8" />
+    <title>Главная страница</title>
+    <style>
+        .button {
+            display: inline-block; /* Строчно-блочный элемент */
+            padding: 5px 20px; /* Добавляем поля */
+            text-decoration: none; /* Убираем подчёркивание у ссылки */
+            cursor: pointer; /* Курсор в виде руки */
+            background: #deefff; /* Фон для браузеров, не поддерживающих градиент */
+            /* Градиент */
+            background: -moz-linear-gradient(top, #deefff 0%, #98bede 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#deefff), color-stop(100%,#98bede));
+            background: -webkit-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: -o-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: -ms-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: linear-gradient(top, #deefff 0%,#98bede 100%);
+            border-radius: 5px; /* Скругляем уголки */
+            border: 1px solid #008; /* Добавляем синюю рамку */
+            font: 12px/1 Arial, sans-serif; /* Рубленый шрифт */
+            color: #2c539e; /* Цвет текста и ссылки */
+        }
+
+        header {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        nav {
+            display: flex;
+            padding: 0 5px;
+            flex-direction: row;
+            display: flex;
+            justify-content: center;
+            align-content: space-between;
+            align-items: center;
+        }
+
+        .item {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <p><a href="index.html" class="button">Главная</a>
+    </header>
+    <nav>
+        <p class="item"><a href="home.html" class="button">Дом</a>
+        <p class="item"><a href="outside.html" class="button">Улица</a>
+        <p class="item"><a href="relay.html" class="button">Реле</a>
+    </nav>
+    <article>
+    </article>
+</body>
+</html>
