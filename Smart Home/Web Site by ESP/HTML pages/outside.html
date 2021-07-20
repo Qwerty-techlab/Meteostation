@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta http-equiv="content-type" content="text/html" charset="windows-1251" />
-    <title>Главная страница</title>
+    <title>Улица</title>
     <style>
         .button {
             display: inline-block; /* Строчно-блочный элемент */
@@ -43,6 +43,7 @@
         }
 
         article {
+            font-size: 32px;
             display: inline-block;
             margin: 0px auto;
             text-align: left;
@@ -59,6 +60,72 @@
         <p class="item"><a href="relay.html" class="button">Реле</a>
     </nav>
     <article>
+        <div>
+            <p>
+                <span class="dht-labels">Температура</span>
+                <span id="temperatureout">%TEMPERATUREOUT%</span>
+                <sup class="units">&deg;C</sup>
+            </p>
+            <p>
+                <span class="dht-labels">Влажность</span>
+                <span id="humidityout">%HUMIDITYOUT%</span>
+                <span>%</span>
+            </p>
+            <p>
+                <span class="dht-labels">Атмосферное давление</span>
+                <span id="pressure">%PRESSURE%</span>
+                <span> мм рт.ст.</span>
+            </p>
+            <p>
+                <span class="dht-labels">Скорость ветра: </span>
+                <span id="speed">%SPEED%</span>
+                <span> м/с</span>
+            </p>
+        </div>
     </article>
 </body>
+<script>
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("temperatureout").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/temperatureout", true);
+  xhttp.send();
+}, 10000);
+
+setInterval(function () {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("humidityout").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/humidityout", true);
+  xhttp.send();
+}, 10000);
+
+setInterval(function () {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("pressure").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/pressure", true);
+  xhttp.send();
+}, 10000);
+    setInterval(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("speed").innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "/speed", true);
+        xhttp.send();
+    }, 10000);
+</script>
 </html>
