@@ -210,6 +210,132 @@ const char Home_html[] PROGMEM = R"rawliteral(
     </article>
 </body>
 </html>)rawliteral";
+//-------------------------Outside----------------------------------------------------------------
+const char outside_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv = "content-type" content = "text/html; charset = UTF-8" />
+    <title>Погода на улице</title>
+    <style>
+        .button {
+            display: inline-block; /* Строчно-блочный элемент */
+            padding: 5px 20px; /* Добавляем поля */
+            text-decoration: none; /* Убираем подчёркивание у ссылки */
+            cursor: pointer; /* Курсор в виде руки */
+            background: #deefff; /* Фон для браузеров, не поддерживающих градиент */
+            /* Градиент */
+            background: -moz-linear-gradient(top, #deefff 0%, #98bede 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#deefff), color-stop(100%,#98bede));
+            background: -webkit-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: -o-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: -ms-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: linear-gradient(top, #deefff 0%,#98bede 100%);
+            border-radius: 5px; /* Скругляем уголки */
+            border: 1px solid #008; /* Добавляем синюю рамку */
+            font: 60px/1 Arial, sans-serif; /* Рубленый шрифт */
+            color: #2c539e; /* Цвет текста и ссылки */
+        }
+        header {
+            margin: 0 auto;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            padding: 0 5px;
+            flex-direction: row;
+            display: flex;
+            justify-content: center;
+            align-content: space-between;
+            align-items: center;
+        }
+        .item {
+            margin: 0 5px;
+        }
+        article {
+            font-size: 42px;
+            display: inline-block;
+            margin: 0px auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <p><a href="/" class="button">Главная</a>
+    </header>
+    <nav>
+        <p class="item"><a href="/home" class="button">Дом</a>
+        <p class="item"><a href="/outside" class="button">Улица</a>
+        <p class="item"><a href="/relay" class="button">Реле</a>
+    </nav>
+    <article>
+    </article>
+</body>
+</html>)rawliteral";
+//-----------------------------relay--------------------------------------------------------------
+const char relay_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv = "content-type" content = "text/html; charset = UTF-8" />
+    <title>Управление реле</title>
+    <style>
+        .button {
+            display: inline-block; /* Строчно-блочный элемент */
+            padding: 5px 20px; /* Добавляем поля */
+            text-decoration: none; /* Убираем подчёркивание у ссылки */
+            cursor: pointer; /* Курсор в виде руки */
+            background: #deefff; /* Фон для браузеров, не поддерживающих градиент */
+            /* Градиент */
+            background: -moz-linear-gradient(top, #deefff 0%, #98bede 100%);
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#deefff), color-stop(100%,#98bede));
+            background: -webkit-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: -o-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: -ms-linear-gradient(top, #deefff 0%,#98bede 100%);
+            background: linear-gradient(top, #deefff 0%,#98bede 100%);
+            border-radius: 5px; /* Скругляем уголки */
+            border: 1px solid #008; /* Добавляем синюю рамку */
+            font: 60px/1 Arial, sans-serif; /* Рубленый шрифт */
+            color: #2c539e; /* Цвет текста и ссылки */
+        }
+        header {
+            margin: 0 auto;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            padding: 0 5px;
+            flex-direction: row;
+            display: flex;
+            justify-content: center;
+            align-content: space-between;
+            align-items: center;
+        }
+        .item {
+            margin: 0 5px;
+        }
+        article {
+            font-size: 42px;
+            display: inline-block;
+            margin: 0px auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <p><a href="/" class="button">Главная</a>
+    </header>
+    <nav>
+        <p class="item"><a href="/home" class="button">Дом</a>
+        <p class="item"><a href="/outside" class="button">Улица</a>
+        <p class="item"><a href="/relay" class="button">Реле</a>
+    </nav>
+    <article>
+    </article>
+</body>
+</html>)rawliteral";
 //================================================================================================
 // Replaces placeholder with DHT values
 String processor(const String& var){
@@ -252,6 +378,12 @@ void setup(){
   });
   server.on("/home", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", Home_html, processor);
+  });
+  server.on("/outside", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", outside_html, processor);
+  });
+  server.on("/relay", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/html", relay_html, processor);
   });
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(t).c_str());
