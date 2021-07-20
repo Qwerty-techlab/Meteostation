@@ -9,10 +9,11 @@ const char* ssid     = "Meteostation";
 const char* password = "$|9U|X";
 //------------------Переменные--------------------------------------------------------------------------------------------------
 float temperature = 0.0;
-float temperatureOut = 0.0;
+float temperatureout = 0.0;
 float humidity = 0.0;
-float humidityOut = 0.0;
-float Speed = 0.0;
+float humidityout = 0.0;
+float wind = 0.0;
+float pressure = 0.0;
 float uptime = millis();
 // Создаём AsyncWebServer object на 80 порту
 AsyncWebServer server(80); 
@@ -32,7 +33,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta http-equiv = "content-type" content = "text/html" charset = "windows-1251"/>
+    <meta http-equiv = "content-type" content = "text/html" charset = "UTF-8"/>
     <title>Главная страница</title>
     <style>
         .button {
@@ -51,7 +52,7 @@ const char index_html[] PROGMEM = R"rawliteral(
             border-radius: 5px; /* Скругляем уголки */
             border: 1px solid #008; /* Добавляем синюю рамку */
             font: 60px/1 Arial, sans-serif; /* Рубленый шрифт */
-            color: #2c539e; /* Цвет текста и ссылки */
+            color: #2c539e; /* Цвет текста и ссылки */`
         }
         header {
             margin: 0 auto;
@@ -147,7 +148,7 @@ const char Home_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta http-equiv="content-type" content="text/html" charset="utf-8" />
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8" />
     <title>Дом</title>
     <style>
         .button {
@@ -265,7 +266,7 @@ const char outside_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta http-equiv="content-type" content="text/html" charset="windows-1251" />
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8" />
     <title>Улица</title>
     <style>
         .button {
@@ -342,7 +343,7 @@ const char outside_html[] PROGMEM = R"rawliteral(
             </p>
             <p>
                 <span class="dht-labels">Скорость ветра: </span>
-                <span id="speed">%SPEED%</span>
+                <span id="wind">%WIND%</span>
                 <span> м/с</span>
             </p>
         </div>
@@ -381,16 +382,16 @@ setInterval(function () {
   xhttp.open("GET", "/pressure", true);
   xhttp.send();
 }, 10000);
-    setInterval(function () {
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("speed").innerHTML = this.responseText;
-            }
-        };
-        xhttp.open("GET", "/speed", true);
-        xhttp.send();
-    }, 10000);
+setInterval(function () {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("wind").innerHTML = this.responseText;
+    }
+  };
+  xhttp.open("GET", "/wind", true);
+  xhttp.send();
+}, 10000);
 </script>
 </html>)rawliteral";
 //-----------------------------relay-------------------------------------------------------------------------------------------------
@@ -398,7 +399,7 @@ const char relay_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta http-equiv="content-type" content="text/html" charset="windows-1251" />
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8" />
     <title>Реле</title>
     <style>
         .button {
@@ -500,13 +501,16 @@ String processor(const String& var){
     return String(uptime);
   }
   else if(var == "TEMPERATUREOUT"){
-    return String(temperatureOut);
+    return String(temperatureout);
   }
   else if (var == "HUMIDITYOUT") {
-      return String(humidityOut);
+      return String(humidityout);
   }
-  else if (var == "SPEED") {
-      return String(Speed);
+  else if (var == "WIND") {
+      return String(wind);
+  }
+  else if (var == "PRESSURE") {
+      return String(pressure);
   }
   return String();
 }
@@ -545,16 +549,16 @@ void setup(){
     request->send_P(200, "text/plain", String(temperature).c_str());
   });
   server.on("/temperatureout", HTTP_GET, [](AsyncWebServerRequest* request) {
-    request->send_P(200, "text/plain", String(temperatureOut).c_str());
+    request->send_P(200, "text/plain", String(temperatureout).c_str());
   });
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(humidity).c_str());
   });
   server.on("/humidityout", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/plain", String(humidityOut).c_str());
+    request->send_P(200, "text/plain", String(humidityout).c_str());
   });
   server.on("/speed", HTTP_GET, [](AsyncWebServerRequest* request) {
-    request->send_P(200, "text/plain", String(Speed).c_str());
+    request->send_P(200, "text/plain", String(wind).c_str());
   });
   server.on("/uptime", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(uptime).c_str());
