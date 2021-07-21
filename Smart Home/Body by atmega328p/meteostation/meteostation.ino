@@ -1,15 +1,15 @@
 //===============================НАСТРОЙКИ===============================================================
 #define BTN1PIN 4  //кнопка вниз
 #define BTN2PIN 3  //кнопка вверх
-#define BTN3PIN 5  //кнопка ввод
+#define BTN3PIN 5                                        //кнопка ввод
 #define DHTPIN 2
-#define RESET_CLOCK 0  //сброс часов при компиляции
+#define RESET_CLOCK 0                                    //сброс часов при компиляции
 #define DHTTYPE DHT21
-#define CH_NUM 0x60  // номер канала (должен совпадать с приёмником)
+#define channel 5                                      // номер канала (должен совпадать с приёмником)
 
 // УРОВЕНЬ МОЩНОСТИ ПЕРЕДАТЧИКА
 // На выбор RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX
-#define SIG_POWER RF24_PA_LOW
+#define SIG_POWER RF24_PA_MAX
 // СКОРОСТЬ ОБМЕНА
 // На выбор RF24_2MBPS, RF24_1MBPS, RF24_250KBPS
 // должна быть одинакова на приёмнике и передатчике!
@@ -35,18 +35,19 @@ GyverBME280 bme;
 DHT dht(DHTPIN, DHTTYPE);
 
 #include "GyverTimer.h"
-GTimer_ms hourT(3600000);     //таймер на час
-GTimer_ms dayT(3600000 * 24); //таймер на сутки
+GTimer_ms hourT(3600000);                                  //таймер на час
+GTimer_ms dayT(3600000 * 24);                              //таймер на сутки
 
-#include <SPI.h>
-#include "nRF24L01.h"
-#include "RF24.h"
-RF24 radio(9, 10);  // "создать" модуль на пинах 9 и 10 для НАНО/УНО
+#include <SPI.h>                                           // Подключаем библиотеку для работы с шиной SPI
+#include <nRF24L01.h>                                      // Подключаем файл настроек из библиотеки RF24
+#include "RF24.h" 
+RF24 radio(9, 10);                                         // "создать" модуль на пинах 9 и 10 для НАНО/УНО
 //--------------------------------Переменные------------------------------------------------------------
 float dispTemp;
 float dispHum;
 float outTemp;
 float outHum;
+float wind = 0.0;
 double dispPres;
 int dispRain;
 unsigned long time123, timer12;
@@ -65,10 +66,8 @@ float hourTempIn;
 float hourTempOut;
 float dayTempIn;
 float dayTempOut;
-byte address[][6] = { "1Node", "2Node", "3Node", "4Node", "5Node", "6Node" };  // возможные номера труб
 byte transmit_data[3]; // массив, хранящий передаваемые данные
 byte latest_data[3];   // массив, хранящий последние переданные данные
-boolean flag;          // флажок отправки данных
 //------------------------------------Массивы------------------------------------------------------------
 // цифры
 uint8_t LT[8] = { 0b00111, 0b01111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111 };

@@ -4,6 +4,10 @@
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+#include <string.h>
 //------------------Название-сети-и-пароль--------------------------------------------------------------------------------------
 const char* ssid     = "Meteostation";
 const char* password = "$|9U|X";
@@ -15,6 +19,12 @@ float humidityout = 0.0;
 float wind = 0.0;
 float pressure = 0.0;
 float uptime = millis();
+float transmit_data[7];
+
+#define channel 5;
+#define RF_SPEED RF24_1MBPS;    // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
+#define RF_PA RF24_PA_MAX;      // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
+
 // Создаём AsyncWebServer object на 80 порту
 AsyncWebServer server(80); 
 
@@ -516,6 +526,20 @@ String processor(const String& var){
 }
 
 void setup(){
+//----------------------------Настройки-nRF-------------------------------------------------------------------------------------------------------
+  SPI.setHwCs(true);
+  SPI.begin();
+  SPI.setDataMode(SPI_MODE0);
+  SPI.setBitOrder(MSBFIRST);   
+  radio.begin();                                        // Инициируем работу nRF24L01+
+  radio.setChannel(channel);                            
+  radio.setDataRate     (RF_SPEED);                     
+  radio.setPALevel      (RF_PA);                        
+  radio.openReadingPipe (1, 0x1234567890LL);            // Открываем 1 трубу с идентификатором 0x1234567890 для приема данных 
+                                                        //(на ожном канале может быть открыто до 6 разных труб, которые должны
+                                                        //отличаться только последним байтом идентификатора)
+  radio.startListening();                             // Включаем приемник, начинаем прослушивать открытую трубу
+
   Serial.begin(115200);
  
   //Добавьте(сотрите) параметр password, если хотите, чтобы точка доступа была закрытой(открытой)
@@ -567,6 +591,17 @@ void setup(){
   server.begin();
 }
  
-void loop(){  
-  uptime = millis();
+void loop() {
+    uptime = millis();
+
+    if (radio.available()) {
+        radio.read(&transmit_data, sizeof(transmit_data));
+        //---------------------------Принятие-данных-с-антенны-----------------------------------------------------------------------------------------------
+        temperature = transmit_data[0];
+        humidity = transmit_data[1];
+        pressure = transmit_data[2];
+        temperatureout = transmit_data[3];
+        humidityout = transmit_data[4];
+        wind = transmit_data[5]
+    }
 }
