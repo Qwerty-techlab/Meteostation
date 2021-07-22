@@ -37,6 +37,7 @@ DHT dht(DHTPIN, DHTTYPE);
 #include "GyverTimer.h"
 GTimer_ms hourT(3600000);                                  //таймер на час
 GTimer_ms dayT(3600000 * 24);                              //таймер на сутки
+GTimer_ms halfSecond(500);
 
 #include <SPI.h>                                           // Подключаем библиотеку для работы с шиной SPI
 #include <nRF24L01.h>                                      // Подключаем файл настроек из библиотеки RF24
@@ -47,7 +48,7 @@ float dispTemp;
 float dispHum;
 float outTemp;
 float outHum;
-float wind = 0.0;
+volatile int wind = 0;
 double dispPres;
 int dispRain;
 unsigned long time123, timer12;
@@ -88,8 +89,13 @@ byte row3[8] = { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b11111, 0b11111, 
 byte row2[8] = { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b11111, 0b11111 };
 byte row1[8] = { 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b11111 };
 //=======================================================================================================
+void rpm() {
+    val++;
+}
+
 void setup() {
   Serial.begin(9600);
+  attachInterrupt(0, rpm, CHANGE);
 //-------------------------------------Инициализации-датчиков---------------------------------------------
   dht.begin();  //инициализация датчика температуры
 
@@ -111,8 +117,6 @@ void setup() {
   dayTempOut = outTemp;
 }
 void loop() { 
-  Radio();
-
   if (buttonENTER.isClick()) lcd.clear();
   if (millis() - time123 >= 60516) {
     time123 = millis();
@@ -162,4 +166,8 @@ void loop() {
   if (hourT.isReady()) hourTempOut = outTemp;
   if (dayT.isReady()) dayTempIn = dispTemp;
   if (dayT.isReady()) dayTempOut = outTemp;
+
+  wind = 0;
+  if (halfSecond.isReady()) wind = (wind * 60) / 2;
+  Radio();
 }

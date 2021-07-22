@@ -492,8 +492,8 @@ const char relay_html[] PROGMEM = R"rawliteral(
     <article>
         <p>
             <span>Реле</span>
-            <a href="#" class="buttonON">ON</a>
-            <a href="#" class="buttonOFF">OFF</a>
+            <a href="/1/on" class="buttonON">ON</a>
+            <a href="/1/0ff" class="buttonOFF">OFF</a>
         </p>
     </article>
 </body>
@@ -526,6 +526,9 @@ String processor(const String& var){
 }
 
 void setup(){
+// Подготовка GPIO
+  pinMode(5, OUTPUT);
+  digitalWrite(5, 1);
 //----------------------------Настройки-nRF-------------------------------------------------------------------------------------------------------
   SPI.setHwCs(true);
   SPI.begin();
@@ -538,7 +541,7 @@ void setup(){
   radio.openReadingPipe (1, 0x1234567890LL);            // Открываем 1 трубу с идентификатором 0x1234567890 для приема данных 
                                                         //(на ожном канале может быть открыто до 6 разных труб, которые должны
                                                         //отличаться только последним байтом идентификатора)
-  radio.startListening();                             // Включаем приемник, начинаем прослушивать открытую трубу
+  radio.startListening();                               // Включаем приемник, начинаем прослушивать открытую трубу
 
   Serial.begin(115200);
  
@@ -604,4 +607,12 @@ void loop() {
         humidityout = transmit_data[4];
         wind = transmit_data[5]
     }
+
+    String req = client.readStringUntil('\r');
+    Serial.println(req);
+    client.flush();
+    if (req.indexOf("/1/0") {
+        != -1) digitalWrite(5, 0);
+    }else if (req.indexOf("/1/1") != -1) digitalWrite(5, 1);
+
 }
