@@ -544,7 +544,7 @@ setInterval(function ( ) {
 </body>
 </html>)rawliteral";
 //============================================================================================================================================
-// Replaces placeholder with DHT values
+// Вывод переменных для парсера
 String processor(const String& var){
   if(var == "TEMPERATURE"){
     return String(temperature);
@@ -617,7 +617,7 @@ void setup(){
 
   // Выводим локальный IP
   Serial.println(WiFi.localIP());
-
+// пин реле
   pinMode(output, OUTPUT);
   digitalWrite(output, LOW);
 //----------------------------Переменные-для-пврсера--------------------------------------------------------------------------------------------
@@ -693,6 +693,7 @@ void loop() {
         humidityout = transmit_data[4];
         wind = transmit_data[5];
     }
+// Вывод значение со слайдера на реле
     digitalWrite(output, !ledState);
 
 }
