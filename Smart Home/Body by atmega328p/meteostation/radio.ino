@@ -1,6 +1,6 @@
-void radioSetup() {                                       // настройка радио
+void radioSetup() {                                       // настройка радио 
     radio.begin();                                        // Инициируем работу nRF24L01+
-    radio.setChannel(channel);                            
+    radio.setChannel(Channel);                            
     radio.setDataRate(SIG_SPEED);
     radio.setPALevel(SIG_POWER);
     radio.openWritingPipe(0x1234567890LL);

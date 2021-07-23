@@ -12,6 +12,7 @@
 const char* ssid     = "Meteostation";
 const char* password = "$|9U|X";
 //------------------Переменные--------------------------------------------------------------------------------------------------
+const char* PARAM_INPUT_1 = "state";
 float temperature = 0.0;
 float temperatureout = 0.0;
 float humidity = 0.0;
@@ -20,10 +21,13 @@ float wind = 0.0;
 float pressure = 0.0;
 float uptime = millis();
 float transmit_data[7];
+int ledState = LOW;
+const int output = 2;
 
-#define channel 5;
-#define RF_SPEED RF24_1MBPS;    // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
-#define RF_PA RF24_PA_MAX;      // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
+#define channel 5
+#define RF_SPEED RF24_1MBPS    // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
+#define RF_PA RF24_PA_MAX      // Указываем мощность передатчика (RF24_PA_MIN=-18dBm, RF24_PA_LOW=-12dBm, RF24_PA_HIGH=-6dBm, RF24_PA_MAX=0dBm)
+RF24 radio(4, 15);
 
 // Создаём AsyncWebServer object на 80 порту
 AsyncWebServer server(80); 
@@ -99,22 +103,22 @@ const char index_html[] PROGMEM = R"rawliteral(
     </nav>
     <article>
         <div>
-            <p>
+            <h1>
                 <span class="dht-labels">Температура в доме: </span>
                 <span id="temperature">%TEMPERATURE%</span>
-                <sup class="units">&deg;C</sup>
-            </p>
-            <p>
+                <span class="units">&deg;C</span>
+            </h1>
+            <h1>
                 <span class="dht-labels">Температура на улице: </span>
                 <span id="temperatureout">%TEMPERATUREOUT%</span>
                 <sup class="units">&deg;C</sup>
-            </p>
+            </h1>
         </div>
         <div>
-            <p>
+            <h1>
                 <span style="font-family: monospace">uptime: </span>
                 <span id="uptime">%UPTIME%</span>
-            </p>
+            </h1>
         </div>
     </article>
 </body>
@@ -217,23 +221,20 @@ const char Home_html[] PROGMEM = R"rawliteral(
         <p class="item"><a href="/relay" class="button">Реле</a>
     </nav>
     <article>
-        <div>
-            <p>
-                <span class="dht-labels">Температура: </span>
+        <h1>
+                <span>Температура: </span>
                 <span id="temperature">%TEMPERATURE%</span>
-                <sup class="units">&deg;C</sup>
-            </p>
-            <p>
-                <span class="dht-labels">Влажность: </span>
+                <span class="units">&deg;C</span>
+        </h1>
+        <h1>
+                <span>Влажность: </span>
                 <span id="humidity">%HUMIDITY%</span>
-                <span>%</span>
-            </p>
-            <p>
-                <span class="dht-labels">Атмосферное давление: </span>
+        </h1>
+        <h1> 
+                <span>Атмосферное давление: </span>
                 <span id="pressure">%PRESSURE%</span>
-                <span> мм рт.ст.</span>
-            </p>
-        </div>
+                <span>мм рт.ст.</span>
+        </h1>
     </article>
 </body>
 <script>
@@ -334,29 +335,26 @@ const char outside_html[] PROGMEM = R"rawliteral(
         <p class="item"><a href="/outside" class="button">Улица</a>
         <p class="item"><a href="/relay" class="button">Реле</a>
     </nav>
-    <article>
-        <div>
-            <p>
-                <span class="dht-labels">Температура</span>
+   <article>
+        <h1>
+                <span>Температура: </span>
                 <span id="temperatureout">%TEMPERATUREOUT%</span>
-                <sup class="units">&deg;C</sup>
-            </p>
-            <p>
-                <span class="dht-labels">Влажность</span>
+                <span class="units">&deg;C</span>
+        </h1>
+        <h1>
+                <span>Влажность: </span>
                 <span id="humidityout">%HUMIDITYOUT%</span>
-                <span>%</span>
-            </p>
-            <p>
-                <span class="dht-labels">Атмосферное давление</span>
+        </h1>
+        <h1> 
+                <span>Атмосферное давление: </span>
                 <span id="pressure">%PRESSURE%</span>
-                <span> мм рт.ст.</span>
-            </p>
-            <p>
-                <span class="dht-labels">Скорость ветра: </span>
+                <span>мм рт.ст.</span>
+        </h1>
+        <h1> 
+                <span>Скорость ветра: </span>
                 <span id="wind">%WIND%</span>
-                <span> м/с</span>
-            </p>
-        </div>
+                <span>m/c</span>
+        </h1>
     </article>
 </body>
 <script>
@@ -430,29 +428,6 @@ const char relay_html[] PROGMEM = R"rawliteral(
             font: 60px/1 Arial, sans-serif; /* Рубленый шрифт */
             color: #2c539e; /* Цвет текста и ссылки */
         }
-        .buttonON {
-            display: inline-block; /* Строчно-блочный элемент */
-            padding: 5px 20px; /* Добавляем поля */
-            text-decoration: none; /* Убираем подчёркивание у ссылки */
-            cursor: pointer; /* Курсор в виде руки */
-            background: #4cff00; /* Фон  */
-            border-radius: 5px; /* Скругляем уголки */
-            border: 1px solid #000; /* Добавляем синюю рамку */
-            font: 32px/1 Arial, sans-serif; /* Рубленый шрифт */
-            color: #2c539e; /* Цвет текста и ссылки */
-        }
-        .buttonOFF {
-            display: inline-block; /* Строчно-блочный элемент */
-            padding: 5px 20px; /* Добавляем поля */
-            text-decoration: none; /* Убираем подчёркивание у ссылки */
-            cursor: pointer; /* Курсор в виде руки */
-            background: #ff0000; /* Фон */
-            border-radius: 5px; /* Скругляем уголки */
-            border: 1px solid #000; /* Добавляем синюю рамку */
-            font: 32px/1 Arial, sans-serif; /* Рубленый шрифт */
-            color: #2c539e; /* Цвет текста и ссылки */
-        }
-
         header {
             margin: 0 auto;
             text-align: center;
@@ -478,6 +453,49 @@ const char relay_html[] PROGMEM = R"rawliteral(
             margin: 0px auto;
             text-align: left;
         }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 120px;
+            height: 68px
+        }
+
+            .switch input {
+                display: none
+            }
+
+        .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 34px
+        }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 52px;
+                width: 52px;
+                left: 8px;
+                bottom: 8px;
+                background-color: #fff;
+                -webkit-transition: .4s;
+                transition: .4s;
+                border-radius: 68px
+            }
+
+        input:checked + .slider {
+            background-color: #2196F3
+        }
+
+            input:checked + .slider:before {
+                -webkit-transform: translateX(52px);
+                -ms-transform: translateX(52px);
+                transform: translateX(52px)
+            }
     </style>
 </head>
 <body>
@@ -491,9 +509,36 @@ const char relay_html[] PROGMEM = R"rawliteral(
     </nav>
     <article>
         <p>
-            <span>Реле</span>
-            <a href="/1/on" class="buttonON">ON</a>
-            <a href="/1/0ff" class="buttonOFF">OFF</a>
+            %BUTTONPLACEHOLDER%
+            <script>
+function toggleCheckbox(element) {
+  var xhr = new XMLHttpRequest();
+  if(element.checked){ xhr.open("GET", "/update?state=1", true); }
+  else { xhr.open("GET", "/update?state=0", true); }
+  xhr.send();
+}
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var inputChecked;
+      var outputStateM;
+      if( this.responseText == 1){
+        inputChecked = true;
+        outputStateM = "On";
+      }
+      else {
+        inputChecked = false;
+        outputStateM = "Off";
+      }
+      document.getElementById("output").checked = inputChecked;
+      document.getElementById("outputState").innerHTML = outputStateM;
+    }
+  };
+  xhttp.open("GET", "/state", true);
+  xhttp.send();
+}, 1000 ) ;
+            </script>
         </p>
     </article>
 </body>
@@ -522,13 +567,26 @@ String processor(const String& var){
   else if (var == "PRESSURE") {
       return String(pressure);
   }
+  else if (var == "BUTTONPLACEHOLDER") {
+      String buttons = "";
+      String outputStateValue = outputState();
+      buttons += "<h4>Output - GPIO 2 - State <span id=\"outputState\"></span></h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"output\" " + outputStateValue + "><span class=\"slider\"></span></label>";
+      return buttons;
+  }
   return String();
 }
 
+String outputState() {
+    if (digitalRead(output)) {
+        return "checked";
+    }
+    else {
+        return "";
+    }
+    return "";
+}
+
 void setup(){
-// Подготовка GPIO
-  pinMode(5, OUTPUT);
-  digitalWrite(5, 1);
 //----------------------------Настройки-nRF-------------------------------------------------------------------------------------------------------
   SPI.setHwCs(true);
   SPI.begin();
@@ -559,6 +617,9 @@ void setup(){
 
   // Выводим локальный IP
   Serial.println(WiFi.localIP());
+
+  pinMode(output, OUTPUT);
+  digitalWrite(output, LOW);
 //----------------------------Переменные-для-пврсера--------------------------------------------------------------------------------------------
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html, processor);
@@ -584,12 +645,37 @@ void setup(){
   server.on("/humidityout", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(humidityout).c_str());
   });
-  server.on("/speed", HTTP_GET, [](AsyncWebServerRequest* request) {
-    request->send_P(200, "text/plain", String(wind).c_str());
+  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(pressure).c_str());
   });
   server.on("/uptime", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(uptime).c_str());
   });
+  server.on("/wind", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", String(wind).c_str());
+  });
+  server.on("/update", HTTP_GET, [](AsyncWebServerRequest* request) {
+      String inputMessage;
+      String inputParam;
+      // получаем значение input1 <ESP_IP>/update?state=<inputMessage>
+      if (request->hasParam(PARAM_INPUT_1)) {
+          inputMessage = request->getParam(PARAM_INPUT_1)->value();
+          inputParam = PARAM_INPUT_1;
+          digitalWrite(output, inputMessage.toInt());
+          ledState = !ledState;
+      }
+      else {
+          inputMessage = "No message sent";
+          inputParam = "none";
+      }
+      Serial.println(inputMessage);
+      request->send(200, "text/plain", "OK");
+      });
+
+  // Отправляем запрос GET на <ESP_IP>/state
+  server.on("/state", HTTP_GET, [](AsyncWebServerRequest* request) {
+      request->send(200, "text/plain", String(digitalRead(output)).c_str());
+      });
   
   server.begin();
 }
@@ -605,14 +691,8 @@ void loop() {
         pressure = transmit_data[2];
         temperatureout = transmit_data[3];
         humidityout = transmit_data[4];
-        wind = transmit_data[5]
+        wind = transmit_data[5];
     }
-
-    String req = client.readStringUntil('\r');
-    Serial.println(req);
-    client.flush();
-    if (req.indexOf("/1/0") {
-        != -1) digitalWrite(5, 0);
-    }else if (req.indexOf("/1/1") != -1) digitalWrite(5, 1);
+    digitalWrite(output, !ledState);
 
 }

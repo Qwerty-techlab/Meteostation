@@ -5,7 +5,8 @@
 #define DHTPIN 2
 #define RESET_CLOCK 0                                    //сброс часов при компиляции
 #define DHTTYPE DHT21
-#define channel 5                                      // номер канала (должен совпадать с приёмником)
+#define Channel 5                                        // номер канала (должен совпадать с приёмником)
+
 
 // УРОВЕНЬ МОЩНОСТИ ПЕРЕДАТЧИКА
 // На выбор RF24_PA_MIN, RF24_PA_LOW, RF24_PA_HIGH, RF24_PA_MAX
@@ -44,6 +45,7 @@ GTimer_ms halfSecond(500);
 #include "RF24.h" 
 RF24 radio(9, 10);                                         // "создать" модуль на пинах 9 и 10 для НАНО/УНО
 //--------------------------------Переменные------------------------------------------------------------
+int val;
 float dispTemp;
 float dispHum;
 float outTemp;
