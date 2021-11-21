@@ -6,7 +6,7 @@
 #include <RF24.h>
 #include <string.h>
 
-String api_key = "4OC07NL1CWY163Z2"; //  Введите свой ключ API записи из ThingSpeak
+String api_key = "XXXXXXXXXXXXXXXX"; //  Введите свой ключ API записи в ThingSpeak
 const char *ssid = "test";           // замените на ваш Wi-Fi ssid и ключ wpa2
 const char *pass = "test1111";       // замените на ваш пароль Wi-Fi
 const char *server = "api.thingspeak.com";
