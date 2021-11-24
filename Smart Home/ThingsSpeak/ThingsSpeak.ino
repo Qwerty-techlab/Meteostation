@@ -7,8 +7,8 @@
 #include <string.h>
 
 String api_key = "XXXXXXXXXXXXXXXX"; //  Введите свой ключ API записи в ThingSpeak
-const char *ssid = "test";           // замените на ваш Wi-Fi ssid и ключ wpa2
-const char *pass = "test1111";       // замените на ваш пароль Wi-Fi
+const char *ssid = "XXXXXXXX";           // замените на ваш Wi-Fi ssid и ключ wpa2
+const char *pass = "XXXXXXXX";       // замените на ваш пароль Wi-Fi
 const char *server = "api.thingspeak.com";
 
 const char *PARAM_INPUT_1 = "state";
